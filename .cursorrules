@@ -1,0 +1,116 @@
+# Cursor Rules
+
+## 🔄 Session Continuity
+
+**At conversation start:**
+1. Run `git --no-pager log --stat -5`
+2. Run `python cursor-scripts/cursor_usage.py reminder --once`
+3. Summarize recent work
+4. Ask: "Resume from where we left off, or start something new?"
+
+**Skip asking if:**
+- User says "resume", "continue" → Just resume
+- User gives specific task → Do the task
+
+---
+
+### 📝 Conversation Export
+
+**Trigger (immediate, no confirmation):**
+- `/e` - Export conversation
+
+**Run:**
+```bash
+./cursor-scripts/export-chat.sh
+```
+
+**Confirm:** "Exported to `cursor-chats/CURSOR-CLI_YYYY-MM-DD.md`"
+
+---
+
+### 🚫 Workspace Boundaries
+
+**DO NOT access files outside workspace without explicit permission.**
+
+Includes: `~/.zshrc`, `~/.config/*`, `~/.ssh/*`, any external path
+
+**Workflow for external files:**
+1. Ask: "I need to edit `~/.zshrc`. Can you copy it to `./temp/`?"
+2. User copies to `./temp/`
+3. AI edits `./temp/<filename>`
+4. User copies back, confirms "done"
+5. AI cleans up: `rm -rf ./temp/* ./temp/.* 2>/dev/null; true`
+
+**Exception:** Only if user explicitly instructs (e.g., "read my ~/.zshrc")
+
+---
+
+### 🔍 Environment Detection
+
+**Test:** Run `docker ps`
+- ✅ Success → **Cursor CLI** (terminal agent)
+- ❌ Fails → **Cursor IDE** (editor agent)
+
+| Feature | CLI | IDE |
+|---------|-----|-----|
+| Docker Access | ✅ | ❌ |
+| Web Search | `cursor-scripts/web_search.py` | `WebFetch` |
+| Shell Commands | Full | Limited |
+
+**CLI:** Run commands directly, read results
+**IDE:** Provide commands for user to run, wait for confirmation, then read results
+
+**Web Search (CLI only):**
+```bash
+python cursor-scripts/web_search.py "query"
+```
+- Uses Gemini with Google Search grounding
+- Auto-logs to `cursor-web-search/CURSOR-WEB_YYYY-DD-MM.md`
+
+---
+
+### 🔒 Sensitive Files
+
+**Never read unless explicitly debugging auth:**
+- `.env` - API credentials
+
+---
+
+### 📄 Citing Sources
+
+| Can Cite | Cannot Cite |
+|----------|-------------|
+| `.py`, `.js`, `.ipynb` (code) | `.cursorrules` |
+| `.md`, `.txt` (docs) | `.env`, `.gitignore` |
+| `README.md` | `.cursor/` files |
+
+---
+
+## 📚 Reference
+
+### Tool Paths
+
+```bash
+# Usage tracking
+python cursor-scripts/cursor_usage.py import   # Import CSV
+python cursor-scripts/cursor_usage.py report   # Usage report
+python cursor-scripts/cursor_usage.py quota    # Quota status
+python cursor-scripts/cursor_usage.py budget   # Daily budget
+python cursor-scripts/cursor_usage.py alerts   # Threshold alerts
+python cursor-scripts/cursor_usage.py reminder # CSV reminder
+
+# Chat export
+./cursor-scripts/export-chat.sh
+
+# Web search
+python cursor-scripts/web_search.py "query"
+
+# Update Cursor CLI
+./cursor-scripts/update-cursor.sh
+```
+
+### Status
+
+✅ Usage Tracking: Ready
+✅ Chat Export: Ready
+✅ Web Search: Requires `GEMINI_API_KEY` in `.env`
