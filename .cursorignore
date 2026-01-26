@@ -8,8 +8,11 @@
 *.key
 
 # Data directories (large files)
+cursor-usage/.reminder_last_date
+cursor-usage/*.db
 cursor-usage/*.csv
 cursor-web-search/*.md
+cursor-chats/*.md
 
 # System files
 .DS_Store

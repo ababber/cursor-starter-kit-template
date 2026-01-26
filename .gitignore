@@ -15,7 +15,6 @@ venv/
 # Cursor state files
 cursor-usage/.reminder_last_date
 cursor-usage/*.db
-cursor-chats/*.md
 
 # System files
 .DS_Store
