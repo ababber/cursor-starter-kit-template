@@ -35,6 +35,7 @@ Contains:
 - `sync-template.sh` - Sync to template repo
 - `install-hook.sh` - Install auto-sync hook
 - `hooks/post-commit` - Auto-sync hook (tracked)
+- `.syncignore` - Files to exclude from sync (gitignore syntax)
 
 ### Template Repository
 **Location**: `https://github.com/ababber/cursor-starter-kit-template`
@@ -50,6 +51,23 @@ Contains all starter kit files, automatically synced from source of truth.
 | `install.sh` | Install starter kit into a repo |
 | `cursorkit.zsh` | Shell helper for install.sh |
 | `create-repo-with-kit.sh` | Create GitHub repo + install kit |
+
+## Configuration
+
+### `.syncignore`
+Controls which files are excluded from syncing to the template. Uses gitignore-style patterns:
+
+```gitignore
+# Exclude user data
+cursor-usage/usage.db
+cursor-chats/*.md
+
+# Keep .gitkeep files
+!cursor-chats/.gitkeep
+```
+
+### `sync.log`
+Sync operations are logged to `cursor-starter-kit/sync.log` for debugging.
 
 ## Auto-Sync Workflow
 
