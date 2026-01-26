@@ -166,16 +166,37 @@ Update the template repo when you:
 
 ### Sync Process
 
-#### Step 1: Make Changes in Source of Truth
+#### Automatic Sync (Recommended) ⭐
+
+**A git hook automatically syncs the template repo whenever you commit changes to `cursor-starter-kit/`.**
+
+Just commit as normal:
 ```bash
-cd /Users/ankit/Playground/_quantRepos/quant/cursor-starter-kit
-# Make your changes
-git add .
+cd /Users/ankit/Playground/_quantRepos/quant
+# Make changes to cursor-starter-kit/
+git add cursor-starter-kit/
 git commit -m "update: Add new feature to starter kit"
 git push
 ```
 
-#### Step 2: Sync to Template (from source of truth)
+The post-commit hook will automatically:
+- Detect changes to `cursor-starter-kit/`
+- Run `sync-template.sh --yes`
+- Sync, commit, and push to template repo
+
+**To disable auto-sync temporarily:**
+```bash
+# Rename the hook
+mv .git/hooks/post-commit .git/hooks/post-commit.disabled
+
+# Re-enable later
+mv .git/hooks/post-commit.disabled .git/hooks/post-commit
+```
+
+#### Manual Sync (if needed)
+
+If you want to sync manually or preview changes:
+
 ```bash
 cd /Users/ankit/Playground/_quantRepos/quant/cursor-starter-kit
 
@@ -183,16 +204,11 @@ cd /Users/ankit/Playground/_quantRepos/quant/cursor-starter-kit
 ./sync-template.sh --dry-run
 
 # Actually sync (auto-commits and pushes)
-./sync-template.sh
+./sync-template.sh --yes
 
 # Or sync without auto-commit (to review first)
-./sync-template.sh --no-commit
+./sync-template.sh --yes --no-commit
 ```
-
-That's it! The script automatically:
-- Syncs all files (excluding maintenance scripts, .git, .env)
-- Commits changes to template repo
-- Pushes to remote
 
 **Note:** `cursorkit.zsh` is synced but you'll need to manually update it in your OMZ config if needed.
 
