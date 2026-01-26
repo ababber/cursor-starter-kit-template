@@ -164,56 +164,32 @@ gh repo create my-new-project \
 
 ### Maintaining the Template
 
-When you update the starter kit in your main repo, sync the template repository:
+The template repository is **automatically synced** via a git hook whenever you commit changes to `cursor-starter-kit/`.
 
-#### Option A: Using Sync Scripts (Recommended)
-
-1. **Copy sync scripts to template repo** (one-time setup):
-   ```bash
-   cd cursor-starter-kit-template
-   cp /Users/ankit/Playground/_quantRepos/quant/cursor-starter-kit/sync-check.sh .
-   cp /Users/ankit/Playground/_quantRepos/quant/cursor-starter-kit/sync-from-source.sh .
-   chmod +x sync-*.sh
-   git add sync-*.sh
-   git commit -m "add: Sync scripts for template maintenance"
-   git push
-   ```
-
-2. **Check sync status:**
-   ```bash
-   cd cursor-starter-kit-template
-   ./sync-check.sh
-   ```
-
-3. **Sync from source of truth:**
-   ```bash
-   # Preview changes first
-   ./sync-from-source.sh --dry-run
-   
-   # Actually sync
-   ./sync-from-source.sh
-   
-   # Review and commit
-   git status
-   git add -A
-   git commit -m "sync: Update from source of truth"
-   git push
-   ```
-
-#### Option B: Manual Sync
-
+#### Setup (one-time)
 ```bash
-cd cursor-starter-kit-template
-cp -r /Users/ankit/Playground/_quantRepos/quant/cursor-starter-kit/* .
-cp -r /Users/ankit/Playground/_quantRepos/quant/cursor-starter-kit/.* . 2>/dev/null || true
-# Remove sync scripts if you don't want them in template
-rm -f sync-check.sh sync-from-source.sh
-git add -A
-git commit -m "sync: Update from source of truth"
+cd /path/to/quant
+./cursor-starter-kit/install-hook.sh
+```
+
+#### Daily Use
+Just commit changes — the hook automatically syncs:
+```bash
+git add cursor-starter-kit/
+git commit -m "update: Add feature"
 git push
 ```
 
+#### Manual Sync (if needed)
+```bash
+cd /path/to/quant/cursor-starter-kit
+./sync-template.sh --dry-run  # Preview
+./sync-template.sh --yes      # Sync, commit, push
+```
+
 **Note:** New repos created from the template will automatically get the latest version. Existing repos won't be affected (they have their own copy).
+
+See `TEMPLATE-MAINTENANCE.md` for full documentation.
 
 ### Pros
 - ✅ Built into GitHub UI
