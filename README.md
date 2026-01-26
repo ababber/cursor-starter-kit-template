@@ -123,28 +123,14 @@ If you need to work around Cursor's MCP tool serialization issues, see the `mcp-
 
 ## Template Repository Maintenance
 
-If you're maintaining a GitHub template repository, use these sync scripts to keep it in sync with the source-of-truth:
+If you're maintaining a GitHub template repository, see **[TEMPLATE-MAINTENANCE.md](TEMPLATE-MAINTENANCE.md)** for complete documentation.
 
-### Check Sync Status
-
-```bash
-# Run from the template repository
-./sync-check.sh
-```
-
-This will show:
-- Files missing in template
-- Extra files in template
-- Files with content differences
-
-### Sync from Source of Truth
+**Quick sync (from source of truth):**
 
 ```bash
-# Dry run (preview changes)
-./sync-from-source.sh --dry-run
-
-# Actually sync
-./sync-from-source.sh
+cd cursor-starter-kit
+./sync-template.sh --dry-run  # Preview
+./sync-template.sh            # Sync, commit, and push
 ```
 
-**Note:** These scripts are not part of the starter kit itself - they're maintenance tools for the template repository. Copy them manually to your template repo if needed.
+**Note:** Maintenance scripts (`sync-template.sh`, `sync-check.sh`, etc.) are not part of the starter kit - they're tools for managing the template repository.
