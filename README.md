@@ -7,6 +7,7 @@ A portable template for setting up Cursor CLI workflows in new repositories.
 1. Copy this entire directory to your new repo root
 2. Copy `.env.example` to `.env` and add your API keys
 3. Make scripts executable: `chmod +x cursor-scripts/*.sh`
+4. Run tests to verify installation: `python tests/run_all.py`
 
 ## Contents
 
@@ -24,6 +25,10 @@ cursor-starter-kit/
 │   ├── web_search.py   # Gemini web search with logging
 │   ├── search_script.py# Minimal web search
 │   └── update-cursor.sh# Update Cursor CLI
+├── tests/              # Test suite
+│   ├── README.md       # Test documentation
+│   ├── run_all.py      # Test runner
+│   └── test_*.py       # Individual test files
 ├── cursor-chats/       # Exported conversations
 ├── cursor-usage/       # Usage CSV imports
 └── cursor-web-search/  # Web search logs
@@ -54,6 +59,20 @@ After copying to your repo:
 1. Edit `.cursorrules` to add project-specific protocols
 2. Update `.cursorignore` for your file patterns
 3. Add project-specific API keys to `.env`
+
+## Testing
+
+After installation, verify everything works:
+
+```bash
+# Run all tests
+python tests/run_all.py
+
+# Run specific test
+python tests/test_cursor_usage.py
+```
+
+See `tests/README.md` for full test documentation.
 
 ## MCP Bypass Pattern
 
