@@ -4,6 +4,26 @@ A portable template for setting up Cursor CLI workflows in new repositories.
 
 ## Quick Start
 
+### Option 1: Use the Installer Script (Recommended)
+
+```bash
+# From the starter kit directory
+./install.sh /path/to/your/repo
+
+# Or install to current directory
+cd /path/to/your/repo
+/path/to/cursor-starter-kit/install.sh
+```
+
+The installer will:
+- Copy all starter kit files
+- Handle existing files (skip, backup, or overwrite)
+- Make scripts executable
+- Create `.env` from `.env.example`
+- Provide next steps
+
+### Option 2: Manual Installation
+
 1. Copy this entire directory to your new repo root
 2. Copy `.env.example` to `.env` and add your API keys
 3. Make scripts executable: `chmod +x cursor-scripts/*.sh`
@@ -15,6 +35,7 @@ A portable template for setting up Cursor CLI workflows in new repositories.
 
 ```
 cursor-starter-kit/
+├── install.sh          # Installation script
 ├── .cursorrules        # AI behavior rules
 ├── .cursorignore       # Files to exclude from Cursor indexing
 ├── .gitignore          # Git ignore patterns
