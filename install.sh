@@ -9,8 +9,19 @@
 #
 # If no path provided, installs to current directory.
 #
+# Environment variables for non-interactive mode:
+#   INSTALL_SKIP_EXISTING=1  - Skip existing files (default: 0)
+#   INSTALL_BACKUP=1         - Backup and overwrite (default: 0)
+#   INSTALL_FORCE=1         - Force reinstall even if already installed (default: 0)
+#
 
 set -euo pipefail
+
+# Check for non-interactive mode
+NON_INTERACTIVE=false
+if [ -n "${INSTALL_SKIP_EXISTING:-}" ] || [ -n "${INSTALL_BACKUP:-}" ] || [ -n "${INSTALL_FORCE:-}" ]; then
+    NON_INTERACTIVE=true
+fi
 
 # Colors for output
 RED='\033[0;31m'
@@ -58,36 +69,48 @@ for marker in "${STARTER_KIT_MARKERS[@]}"; do
 done
 
 if [ "$ALREADY_INSTALLED" = true ]; then
-    echo "${YELLOW}⚠️  Cursor Starter Kit appears to already be installed${NC}"
-    echo ""
-    echo "Found starter kit files in: $TARGET_REPO"
-    echo ""
-    echo "Options:"
-    echo "  1) Reinstall anyway (will handle existing files)"
-    echo "  2) Cancel"
-    echo ""
-    read -p "Choose option (1-2): " -n 1 -r
-    echo
-    
-    case $REPLY in
-        1)
-            echo "Proceeding with reinstallation..."
-            ;;
-        2|*)
-            echo "Installation cancelled."
-            exit 0
-            ;;
-    esac
+    if [ "$NON_INTERACTIVE" = true ] && [ "${INSTALL_FORCE:-0}" = "1" ]; then
+        echo "Proceeding with reinstallation (non-interactive mode)..."
+    elif [ "$NON_INTERACTIVE" = true ]; then
+        echo "${YELLOW}⚠️  Cursor Starter Kit already installed. Set INSTALL_FORCE=1 to reinstall.${NC}"
+        exit 0
+    else
+        echo "${YELLOW}⚠️  Cursor Starter Kit appears to already be installed${NC}"
+        echo ""
+        echo "Found starter kit files in: $TARGET_REPO"
+        echo ""
+        echo "Options:"
+        echo "  1) Reinstall anyway (will handle existing files)"
+        echo "  2) Cancel"
+        echo ""
+        read -p "Choose option (1-2): " -n 1 -r
+        echo
+        
+        case $REPLY in
+            1)
+                echo "Proceeding with reinstallation..."
+                ;;
+            2|*)
+                echo "Installation cancelled."
+                exit 0
+                ;;
+        esac
+    fi
 fi
 
 # Check if target is a git repo
 if [ ! -d "$TARGET_REPO/.git" ]; then
-    echo "${YELLOW}⚠️  Warning: Target directory doesn't appear to be a git repository${NC}"
-    read -p "Continue anyway? (y/N) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "Installation cancelled."
-        exit 1
+    if [ "$NON_INTERACTIVE" = true ]; then
+        echo "${YELLOW}⚠️  Warning: Target directory doesn't appear to be a git repository${NC}"
+        echo "Continuing anyway (non-interactive mode)..."
+    else
+        echo "${YELLOW}⚠️  Warning: Target directory doesn't appear to be a git repository${NC}"
+        read -p "Continue anyway? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "Installation cancelled."
+            exit 1
+        fi
     fi
 fi
 
@@ -115,24 +138,9 @@ for item in "${FILES_TO_COPY[@]}"; do
 done
 
 if [ ${#EXISTING_FILES[@]} -gt 0 ]; then
-    echo "${YELLOW}⚠️  The following files/directories already exist:${NC}"
-    for file in "${EXISTING_FILES[@]}"; do
-        echo "   - $file"
-    done
-    echo ""
-    echo "Options:"
-    echo "  1) Skip existing files (recommended)"
-    echo "  2) Backup and overwrite"
-    echo "  3) Cancel"
-    echo ""
-    read -p "Choose option (1-3): " -n 1 -r
-    echo
-    
-    case $REPLY in
-        1)
-            SKIP_EXISTING=true
-            ;;
-        2)
+    if [ "$NON_INTERACTIVE" = true ]; then
+        # Non-interactive mode: use environment variables
+        if [ "${INSTALL_BACKUP:-0}" = "1" ]; then
             SKIP_EXISTING=false
             BACKUP_DIR="$TARGET_REPO/.cursor-starter-kit-backup-$(date +%Y%m%d-%H%M%S)"
             echo "Creating backup in: $BACKUP_DIR"
@@ -143,16 +151,53 @@ if [ ${#EXISTING_FILES[@]} -gt 0 ]; then
                 fi
             done
             echo "${GREEN}✅ Backup created${NC}"
-            ;;
-        3)
-            echo "Installation cancelled."
-            exit 1
-            ;;
-        *)
-            echo "Invalid option. Installation cancelled."
-            exit 1
-            ;;
-    esac
+        elif [ "${INSTALL_SKIP_EXISTING:-0}" = "1" ]; then
+            SKIP_EXISTING=true
+            echo "Skipping existing files (non-interactive mode)"
+        else
+            SKIP_EXISTING=false
+            echo "Overwriting existing files (non-interactive mode)"
+        fi
+    else
+        echo "${YELLOW}⚠️  The following files/directories already exist:${NC}"
+        for file in "${EXISTING_FILES[@]}"; do
+            echo "   - $file"
+        done
+        echo ""
+        echo "Options:"
+        echo "  1) Skip existing files (recommended)"
+        echo "  2) Backup and overwrite"
+        echo "  3) Cancel"
+        echo ""
+        read -p "Choose option (1-3): " -n 1 -r
+        echo
+        
+        case $REPLY in
+            1)
+                SKIP_EXISTING=true
+                ;;
+            2)
+                SKIP_EXISTING=false
+                BACKUP_DIR="$TARGET_REPO/.cursor-starter-kit-backup-$(date +%Y%m%d-%H%M%S)"
+                echo "Creating backup in: $BACKUP_DIR"
+                mkdir -p "$BACKUP_DIR"
+                for file in "${EXISTING_FILES[@]}"; do
+                    if [ -e "$TARGET_REPO/$file" ]; then
+                        cp -r "$TARGET_REPO/$file" "$BACKUP_DIR/" 2>/dev/null || true
+                    fi
+                done
+                echo "${GREEN}✅ Backup created${NC}"
+                ;;
+            3)
+                echo "Installation cancelled."
+                exit 1
+                ;;
+            *)
+                echo "Invalid option. Installation cancelled."
+                exit 1
+                ;;
+        esac
+    fi
 else
     SKIP_EXISTING=false
 fi
@@ -170,32 +215,34 @@ for item in "${FILES_TO_COPY[@]}"; do
     
     if [ "$SKIP_EXISTING" = true ] && [ -e "$target" ]; then
         echo "   ⏭️  Skipping existing: $item"
-        ((SKIPPED++))
+        SKIPPED=$((SKIPPED + 1))
         continue
     fi
     
     if [ -d "$source" ]; then
         # Copy directory
         mkdir -p "$(dirname "$target")"
-        cp -r "$source" "$target" 2>/dev/null || {
+        if cp -r "$source" "$target" 2>/dev/null; then
+            echo "   ${GREEN}✅ Copied directory: $item${NC}"
+            COPIED=$((COPIED + 1))
+        else
             echo "   ${RED}❌ Failed to copy: $item${NC}"
-            continue
-        }
-        echo "   ${GREEN}✅ Copied directory: $item${NC}"
+            # Don't exit, continue with other files
+        fi
     elif [ -f "$source" ]; then
         # Copy file
         mkdir -p "$(dirname "$target")"
-        cp "$source" "$target" 2>/dev/null || {
+        if cp "$source" "$target" 2>/dev/null; then
+            echo "   ${GREEN}✅ Copied file: $item${NC}"
+            COPIED=$((COPIED + 1))
+        else
             echo "   ${RED}❌ Failed to copy: $item${NC}"
-            continue
-        }
-        echo "   ${GREEN}✅ Copied file: $item${NC}"
+            # Don't exit, continue with other files
+        fi
     else
         echo "   ${YELLOW}⚠️  Source not found: $item${NC}"
-        continue
+        # Don't exit, continue with other files
     fi
-    
-    ((COPIED++))
 done
 
 # Make scripts executable
