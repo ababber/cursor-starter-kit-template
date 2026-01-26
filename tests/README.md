@@ -8,6 +8,9 @@ Tests for verifying the starter kit scripts work correctly after installation.
 # Run all tests
 python tests/run_all.py
 
+# Test fresh agent setup (validates protocols are in place)
+python tests/test_fresh_agent.py
+
 # Run specific test
 python tests/test_cursor_usage.py
 python tests/test_export_chat.py
@@ -18,6 +21,7 @@ python tests/test_web_search.py
 
 | Script | Test File | Status |
 |--------|-----------|--------|
+| Fresh agent setup | `test_fresh_agent.py` | ✅ |
 | `cursor_usage.py` | `test_cursor_usage.py` | ✅ |
 | `export-chat.sh` | `test_export_chat.py` | ✅ |
 | `web_search.py` | `test_web_search.py` | ⚠️ (requires API key) |
@@ -55,8 +59,9 @@ pytest tests/ --cov=cursor-scripts --cov-report=html
 ```
 tests/
 ├── README.md              # This file
-├── run_all.py            # Test runner
-├── test_cursor_usage.py  # Usage tracking tests
+├── run_all.py             # Test runner
+├── test_fresh_agent.py    # Fresh agent setup validation
+├── test_cursor_usage.py   # Usage tracking tests
 ├── test_export_chat.py    # Chat export tests
 ├── test_web_search.py     # Web search tests
 ├── test_search_script.py  # Minimal search tests
