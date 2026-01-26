@@ -4,7 +4,29 @@ A portable template for setting up Cursor CLI workflows in new repositories.
 
 ## Quick Start
 
-### Option 1: Use the Installer Script (Recommended)
+### Option 1: GitHub Template Repository (Easiest)
+
+Create a template repository with the starter kit, then use GitHub's "Use this template" button for new repos.
+
+See `TEMPLATE-SETUP.md` for detailed instructions.
+
+### Option 2: Automated CLI Script
+
+Automatically create a new GitHub repo with the starter kit:
+
+```bash
+./create-repo-with-kit.sh my-project --private --clone
+```
+
+This script:
+- Creates the GitHub repository
+- Clones it locally
+- Installs the starter kit
+- Commits and pushes everything
+
+See `TEMPLATE-SETUP.md` for full documentation.
+
+### Option 3: Manual Installation (Use the Installer Script)
 
 ```bash
 # From the starter kit directory
