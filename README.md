@@ -120,3 +120,31 @@ See `tests/README.md` for full test documentation.
 ## MCP Bypass Pattern
 
 If you need to work around Cursor's MCP tool serialization issues, see the `mcp-bypass-skeleton/` directory (if included) for a template wrapper pattern.
+
+## Template Repository Maintenance
+
+If you're maintaining a GitHub template repository, use these sync scripts to keep it in sync with the source-of-truth:
+
+### Check Sync Status
+
+```bash
+# Run from the template repository
+./sync-check.sh
+```
+
+This will show:
+- Files missing in template
+- Extra files in template
+- Files with content differences
+
+### Sync from Source of Truth
+
+```bash
+# Dry run (preview changes)
+./sync-from-source.sh --dry-run
+
+# Actually sync
+./sync-from-source.sh
+```
+
+**Note:** These scripts are not part of the starter kit itself - they're maintenance tools for the template repository. Copy them manually to your template repo if needed.

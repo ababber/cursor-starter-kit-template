@@ -164,22 +164,56 @@ gh repo create my-new-project \
 
 ### Maintaining the Template
 
-When you update the starter kit in your main repo:
+When you update the starter kit in your main repo, sync the template repository:
 
-1. **Update the template repository:**
+#### Option A: Using Sync Scripts (Recommended)
+
+1. **Copy sync scripts to template repo** (one-time setup):
    ```bash
    cd cursor-starter-kit-template
-   git pull origin main  # If you sync from main repo
-   # OR manually copy updated files:
-   cp -r /path/to/updated/cursor-starter-kit/* .
-   git add -A
-   git commit -m "Update: sync with latest starter kit"
+   cp /Users/ankit/Playground/_quantRepos/quant/cursor-starter-kit/sync-check.sh .
+   cp /Users/ankit/Playground/_quantRepos/quant/cursor-starter-kit/sync-from-source.sh .
+   chmod +x sync-*.sh
+   git add sync-*.sh
+   git commit -m "add: Sync scripts for template maintenance"
    git push
    ```
 
-2. **New repos** created from the template will automatically get the latest version
+2. **Check sync status:**
+   ```bash
+   cd cursor-starter-kit-template
+   ./sync-check.sh
+   ```
 
-3. **Existing repos** won't be affected (they have their own copy)
+3. **Sync from source of truth:**
+   ```bash
+   # Preview changes first
+   ./sync-from-source.sh --dry-run
+   
+   # Actually sync
+   ./sync-from-source.sh
+   
+   # Review and commit
+   git status
+   git add -A
+   git commit -m "sync: Update from source of truth"
+   git push
+   ```
+
+#### Option B: Manual Sync
+
+```bash
+cd cursor-starter-kit-template
+cp -r /Users/ankit/Playground/_quantRepos/quant/cursor-starter-kit/* .
+cp -r /Users/ankit/Playground/_quantRepos/quant/cursor-starter-kit/.* . 2>/dev/null || true
+# Remove sync scripts if you don't want them in template
+rm -f sync-check.sh sync-from-source.sh
+git add -A
+git commit -m "sync: Update from source of truth"
+git push
+```
+
+**Note:** New repos created from the template will automatically get the latest version. Existing repos won't be affected (they have their own copy).
 
 ### Pros
 - ✅ Built into GitHub UI
