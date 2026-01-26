@@ -1,0 +1,32 @@
+#!/bin/zsh
+#
+# Post-commit hook: Auto-sync template repo when cursor-starter-kit changes
+#
+# This hook runs after each commit and checks if files in cursor-starter-kit/
+# were changed. If so, it automatically syncs the template repository.
+
+# Get the last commit
+LAST_COMMIT=$(git rev-parse HEAD)
+
+# Check if any files in cursor-starter-kit/ were changed in this commit
+if git diff-tree --no-commit-id --name-only -r "$LAST_COMMIT" | grep -q "^cursor-starter-kit/"; then
+    # Get the repo root
+    REPO_ROOT="$(git rev-parse --show-toplevel)"
+    SYNC_SCRIPT="$REPO_ROOT/cursor-starter-kit/sync-template.sh"
+    
+    # Check if sync script exists
+    if [ -f "$SYNC_SCRIPT" ] && [ -x "$SYNC_SCRIPT" ]; then
+        echo ""
+        echo "🔄 cursor-starter-kit/ changed - syncing template repository..."
+        cd "$REPO_ROOT/cursor-starter-kit"
+        
+        # Run sync (non-interactive, auto-commit)
+        "$SYNC_SCRIPT" --yes 2>&1 | grep -v "^$" || {
+            echo "⚠️  Template sync had issues (check manually if needed)"
+        }
+    else
+        echo "⚠️  Sync script not found: $SYNC_SCRIPT"
+    fi
+fi
+
+exit 0

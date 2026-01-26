@@ -125,12 +125,22 @@ If you need to work around Cursor's MCP tool serialization issues, see the `mcp-
 
 If you're maintaining a GitHub template repository, see **[TEMPLATE-MAINTENANCE.md](TEMPLATE-MAINTENANCE.md)** for complete documentation.
 
-**Quick sync (from source of truth):**
+**Automatic sync (recommended):**
+
+```bash
+# One-time setup: Install git hook
+./install-hook.sh
+
+# Then just commit normally - template auto-syncs!
+git commit -m "update: Add feature"
+```
+
+**Manual sync:**
 
 ```bash
 cd cursor-starter-kit
 ./sync-template.sh --dry-run  # Preview
-./sync-template.sh            # Sync, commit, and push
+./sync-template.sh --yes      # Sync, commit, and push
 ```
 
-**Note:** Maintenance scripts (`sync-template.sh`, `sync-check.sh`, etc.) are not part of the starter kit - they're tools for managing the template repository.
+**Note:** Maintenance scripts (`sync-template.sh`, `install-hook.sh`, etc.) are not part of the starter kit - they're tools for managing the template repository.

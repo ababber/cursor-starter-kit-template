@@ -170,9 +170,14 @@ Update the template repo when you:
 
 **A git hook automatically syncs the template repo whenever you commit changes to `cursor-starter-kit/`.**
 
-Just commit as normal:
+**First-time setup:**
 ```bash
-cd /Users/ankit/Playground/_quantRepos/quant
+cd /path/to/quant
+./cursor-starter-kit/install-hook.sh
+```
+
+Then just commit as normal:
+```bash
 # Make changes to cursor-starter-kit/
 git add cursor-starter-kit/
 git commit -m "update: Add new feature to starter kit"
@@ -184,13 +189,14 @@ The post-commit hook will automatically:
 - Run `sync-template.sh --yes`
 - Sync, commit, and push to template repo
 
-**To disable auto-sync temporarily:**
+**To disable auto-sync:**
 ```bash
-# Rename the hook
-mv .git/hooks/post-commit .git/hooks/post-commit.disabled
+./cursor-starter-kit/install-hook.sh --uninstall
+```
 
-# Re-enable later
-mv .git/hooks/post-commit.disabled .git/hooks/post-commit
+**To re-enable:**
+```bash
+./cursor-starter-kit/install-hook.sh
 ```
 
 #### Manual Sync (if needed)
