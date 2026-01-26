@@ -63,6 +63,47 @@ cursor = conn.cursor()
 cursor.execute("SELECT data FROM blobs")
 rows = cursor.fetchall()
 
+def format_content(content):
+    """Parse and format message content from JSON structure."""
+    if not content:
+        return ""
+    
+    # Content might be a JSON string or already parsed
+    if isinstance(content, str):
+        try:
+            content = json.loads(content)
+        except (json.JSONDecodeError, TypeError):
+            # If it's not JSON, return as-is (plain text)
+            return content
+    
+    # If content is a list (array of message parts)
+    if isinstance(content, list):
+        parts = []
+        for part in content:
+            if isinstance(part, dict):
+                part_type = part.get('type', '')
+                if part_type == 'text':
+                    text = part.get('text', '')
+                    if text:
+                        parts.append(text)
+                elif part_type == 'tool-call':
+                    # Format tool calls nicely
+                    tool_name = part.get('toolName', 'unknown')
+                    tool_id = part.get('toolCallId', '')[:8] if part.get('toolCallId') else ''
+                    parts.append(f"<tool_call: {tool_name} (id: {tool_id})>")
+                elif part_type == 'tool-result':
+                    # Optionally include tool results (might be verbose)
+                    tool_name = part.get('toolName', 'unknown')
+                    parts.append(f"<tool_result: {tool_name}>")
+        return "\n".join(parts)
+    
+    # If content is already a string, return it
+    if isinstance(content, str):
+        return content
+    
+    # Fallback: convert to string
+    return str(content)
+
 messages = []
 for row in rows:
     try:
@@ -79,8 +120,10 @@ for row in rows:
             role = data.get('role', '')
             content = data.get('content', '')
             if role in ('user', 'assistant') and content:
-                # Skip system messages and empty content
-                messages.append((role, content))
+                # Parse and format content
+                formatted_content = format_content(content)
+                if formatted_content:
+                    messages.append((role, formatted_content))
     except (json.JSONDecodeError, TypeError, AttributeError):
         continue
 
