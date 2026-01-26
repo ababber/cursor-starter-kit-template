@@ -2,7 +2,7 @@
 
 ## 🔄 Session Continuity
 
-**At conversation start:**
+**⚠️ MANDATORY at conversation start (unless resuming from summary):**
 1. Run `git --no-pager log --stat -5`
 2. Run `python cursor-scripts/cursor_usage.py reminder --once`
 3. Summarize recent work
@@ -11,6 +11,8 @@
 **Skip asking if:**
 - User says "resume", "continue" → Just resume
 - User gives specific task → Do the task
+
+**Self-check:** If you didn't run steps 1-2 at start, acknowledge the skip.
 
 ---
 
@@ -108,6 +110,20 @@ python cursor-scripts/web_search.py "query"
 # Update Cursor CLI
 ./cursor-scripts/update-cursor.sh
 ```
+
+### Git Commits
+
+**⚠️ BEFORE committing, follow `COMMIT-CONVENTIONS.md`:**
+- Use tags: `add:`, `update:`, `fix:`, `refactor:`, `style:`, `revert:`
+- Format: `<tag>: <description>`
+- Date format in filenames: `YYYY-DD-MM`
+
+### Documentation Files
+
+- `COMMIT-CONVENTIONS.md` - Git commit message format
+- `cursor-scripts/` - CLI tools and utilities
+- `cursor-chats/` - Conversation logs
+- `cursor-web-search/` - Web search logs
 
 ### Status
 
