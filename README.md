@@ -2,8 +2,6 @@
 
 A portable template for setting up Cursor CLI workflows in new repositories.
 
-> **Note:** Changes to this directory are automatically synced to the template repository via git hook.
-
 ## Quick Start
 
 ### Option 1: GitHub Template Repository (Easiest)
