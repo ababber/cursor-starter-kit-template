@@ -1,6 +1,7 @@
 #!/bin/zsh
 #
 # cursorkit: install Cursor Starter Kit into a repo
+# Version: 1.0.0
 #
 # Source this file in your shell (e.g., add to ~/.zshrc):
 #   source "/path/to/cursor-starter-kit/cursorkit.zsh"

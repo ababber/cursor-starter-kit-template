@@ -8,8 +8,11 @@
 # Get the last commit
 LAST_COMMIT=$(git rev-parse HEAD)
 
+# Get changed files in cursor-starter-kit/
+CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "$LAST_COMMIT" | grep "^cursor-starter-kit/" || true)
+
 # Check if any files in cursor-starter-kit/ were changed in this commit
-if git diff-tree --no-commit-id --name-only -r "$LAST_COMMIT" | grep -q "^cursor-starter-kit/"; then
+if [ -n "$CHANGED_FILES" ]; then
     # Get the repo root
     REPO_ROOT="$(git rev-parse --show-toplevel)"
     SYNC_SCRIPT="$REPO_ROOT/cursor-starter-kit/sync-template.sh"
@@ -26,6 +29,20 @@ if git diff-tree --no-commit-id --name-only -r "$LAST_COMMIT" | grep -q "^cursor
         }
     else
         echo "⚠️  Sync script not found: $SYNC_SCRIPT"
+    fi
+    
+    # Check if cursorkit.zsh was updated - remind user to update OMZ
+    if echo "$CHANGED_FILES" | grep -q "cursor-starter-kit/cursorkit.zsh"; then
+        echo ""
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "📝 REMINDER: cursorkit.zsh was updated!"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+        echo "   Update your local OMZ copy if needed:"
+        echo "   cp cursor-starter-kit/cursorkit.zsh ~/.oh-my-zsh/custom/cursorkit.zsh"
+        echo ""
+        echo "   Or reload your shell: exec zsh"
+        echo ""
     fi
 fi
 
