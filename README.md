@@ -106,10 +106,33 @@ cursor-starter-kit/
 
 After copying to your repo:
 
-1. Edit `.cursorrules` to add project-specific protocols
-2. Update `.cursorignore` for your file patterns
-3. Add project-specific API keys to `.env`
-4. Customize categories in `review.py` for your domain
+1. **Edit `.cursorrules`** to add project-specific protocols at the bottom
+2. **Update `.cursorignore`** for your file patterns
+3. **Add API keys to `.env`** (copy from `.env.example`)
+4. **Customize categories** in `review.py` for your domain
+
+### Adding Project-Specific Rules
+
+The `.cursorrules` file has a "Project-Specific Rules" section at the bottom. Add your custom rules there:
+
+```markdown
+## 🔧 Project-Specific Rules
+
+### My API Wrapper
+- Always use `my_wrapper.py` instead of direct API calls
+- Check `./results/` for cached responses before making new requests
+
+### Testing Protocol
+- Run `pytest tests/` before any commit
+- Use `--dry-run` flag first for destructive operations
+```
+
+**Examples of project-specific additions:**
+- MCP server wrappers (like QuantConnect)
+- Custom environment detection (Docker, virtual envs)
+- Domain-specific search protocols
+- API authentication flows
+- CI/CD integration rules
 
 ### Flashcard Categories
 
