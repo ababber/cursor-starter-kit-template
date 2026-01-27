@@ -121,10 +121,12 @@ FILES_TO_COPY=(
     ".gitignore"
     ".env.example"
     "README.md"
+    "COMMIT-CONVENTIONS.md"
     "cursor-scripts/"
     "cursor-chats/"
     "cursor-usage/"
     "cursor-web-search/"
+    "cursor-data/"
     "mcp-bypass-skeleton/"
     "tests/"
 )

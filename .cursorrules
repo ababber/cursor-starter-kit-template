@@ -2,17 +2,32 @@
 
 ## 🔄 Session Continuity
 
-**⚠️ MANDATORY at conversation start (unless resuming from summary):**
+**⚠️ ALWAYS run at conversation start (no exceptions):**
 1. Run `git --no-pager log --stat -5`
 2. Run `python cursor-scripts/cursor_usage.py reminder --once`
-3. Summarize recent work
-4. Ask: "Resume from where we left off, or start something new?"
+3. Run `docker ps` for environment detection
+4. Run `python cursor-scripts/startup_cards.py` for daily digest + quiz
+5. Summarize recent work + environment status (CLI/IDE, Docker running/not)
 
-**Skip asking if:**
-- User says "resume", "continue" → Just resume
-- User gives specific task → Do the task
+**Then:**
+- User gave specific task → Do the task immediately after summary
+- User says "resume", "continue" → Resume previous work
+- Otherwise → Ask: "Resume from where we left off, or start something new?"
 
-**Self-check:** If you didn't run steps 1-2 at start, acknowledge the skip.
+**No skipping:** These checks surface critical context (Docker status, recent changes) that affects task execution.
+
+---
+
+### 🔄 New Chat
+
+**Trigger:** User says "new chat", "start fresh", "clear chat", etc.
+
+**Run:**
+```bash
+./cursor-scripts/cursor-new-chat.sh
+```
+
+This exports the current chat and clears history. User then restarts CLI agent.
 
 ---
 
@@ -49,14 +64,18 @@ Includes: `~/.zshrc`, `~/.config/*`, `~/.ssh/*`, any external path
 
 ### 🔍 Environment Detection
 
-**Test:** Run `docker ps`
-- ✅ Success → **Cursor CLI** (terminal agent)
-- ❌ Fails → **Cursor IDE** (editor agent)
+Determined by `docker ps` in startup checks.
+
+| Mode | Meaning |
+|------|---------|
+| **CLI** | Docker running — full shell access, run commands directly |
+| **IDE** | Docker not running — provide commands for user to run manually |
 
 | Feature | CLI | IDE |
 |---------|-----|-----|
 | Docker Access | ✅ | ❌ |
-| Web Search | `cursor-scripts/web_search.py` | `WebFetch` |
+| Web Search | `web_search.py` | `WebFetch` |
+| Browser MCP | ✅ (fallback) | ✅ (fallback) |
 | Shell Commands | Full | Limited |
 
 **CLI:** Run commands directly, read results
@@ -68,6 +87,55 @@ python cursor-scripts/web_search.py "query"
 ```
 - Uses Gemini with Google Search grounding
 - Auto-logs to `cursor-web-search/CURSOR-WEB_YYYY-DD-MM.md`
+
+---
+
+### 🔬 Research Protocol (Multi-Source Grounding)
+
+**When to trigger:** Any question requiring factual accuracy, technical details, best practices, or current information.
+
+**Mandatory source order:**
+
+| Step | Source | Method | When to Use |
+|------|--------|--------|-------------|
+| 1 | **Codebase** | Grep/Glob/Read | Always first - check existing code/patterns |
+| 2 | **Local Docs** | Read `.md` files | Project-specific guides, READMEs |
+| 3 | **Web Search** | `web_search.py` (CLI) | Queries, discovery, external info |
+| 4 | **WebFetch** | `WebFetch` tool | Known URLs, specific doc pages |
+| 5 | **Browser** | Browser MCP tools | JS-rendered pages, interaction needed |
+
+**Web tool hierarchy:**
+| Tool | Best For | Speed | When to Use |
+|------|----------|-------|-------------|
+| `web_search.py` | Queries, discovery | Fast | Primary - Gemini + Google grounding |
+| `WebFetch` | Specific URLs | Medium | Secondary - direct fetch of known pages |
+| Browser MCP | JS pages, interaction | Slow | Fallback - when above return incomplete |
+
+**Use Browser MCP when:**
+- Page requires JavaScript rendering (WebFetch returns incomplete/empty)
+- Need to navigate or interact with the page
+- Visual verification needed
+- Other methods fail or return partial data
+
+**Execution rules:**
+- **Run sources in parallel** when independent (e.g., grep codebase + read docs simultaneously)
+- **Cite sources** in response (file paths, URLs from web search)
+- **Skip steps** only if clearly irrelevant (e.g., skip codebase for "what's the weather")
+- **Escalate to browser** only when faster methods fail
+
+**Example triggers:**
+- "How do I use X?" → Codebase (existing examples) → Docs → Web (official docs)
+- "What's the best way to Y?" → Codebase (current approach) → Web (best practices)
+- "Is Z still supported?" → Web (latest info) → Docs (local notes)
+
+**CLI execution:**
+```bash
+# Codebase search
+rg "pattern" --type py
+
+# Web search (grounded)
+python cursor-scripts/web_search.py "query"
+```
 
 ---
 
@@ -104,12 +172,55 @@ python cursor-scripts/cursor_usage.py reminder # CSV reminder
 # Chat export
 ./cursor-scripts/export-chat.sh
 
+# New chat (export + clear)
+./cursor-scripts/cursor-new-chat.sh
+
 # Web search
 python cursor-scripts/web_search.py "query"
 
 # Update Cursor CLI
 ./cursor-scripts/update-cursor.sh
 ```
+
+### Learning Tools
+
+**Flashcard System (`review.py`):**
+```bash
+python cursor-scripts/review.py --today        # Show due cards
+python cursor-scripts/review.py --add "Q" "A"  # Add card
+python cursor-scripts/review.py --quiz         # Interactive review
+python cursor-scripts/review.py --stats        # Review statistics
+```
+
+**Startup Cards (`startup_cards.py`):**
+```bash
+python cursor-scripts/startup_cards.py          # Full digest + quiz
+python cursor-scripts/startup_cards.py --reveal # Show quiz answer
+```
+
+**Data storage:** `cursor-data/flashcards.json`
+
+### Model Selection
+
+**⚠️ BEFORE recommending ANY model:**
+1. **Fetch latest benchmarks** — don't rely on outdated knowledge
+2. **Infer task type** from user's question
+3. **Follow the workflow below**
+
+**Workflow:**
+
+1. **Automatically fetch latest benchmarks:**
+   ```bash
+   python cursor-scripts/get_model_benchmarks.py [task_type]
+   ```
+   - `task_type`: `coding`, `reasoning`, `writing`, `fast`, or `general`
+   - Infer from user's question if not specified
+
+2. **Make recommendation based on:**
+   - Latest third-party benchmarks (LMSYS Arena, SWE-bench, HumanEval, etc.)
+   - Task requirements (coding, reasoning, speed, cost)
+   - Cost considerations (from latest pricing data)
+   - User's specific needs
 
 ### Git Commits
 
@@ -124,9 +235,13 @@ python cursor-scripts/web_search.py "query"
 - `cursor-scripts/` - CLI tools and utilities
 - `cursor-chats/` - Conversation logs
 - `cursor-web-search/` - Web search logs
+- `cursor-data/` - Flashcard and learning data
 
 ### Status
 
 ✅ Usage Tracking: Ready
 ✅ Chat Export: Ready
 ✅ Web Search: Requires `GEMINI_API_KEY` in `.env`
+✅ Learning Tools: `review.py`, `startup_cards.py`
+✅ Model Benchmarks: `get_model_benchmarks.py`
+✅ Browser MCP: Available as fallback

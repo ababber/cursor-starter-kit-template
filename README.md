@@ -44,37 +44,35 @@ The installer will:
 - Create `.env` from `.env.example`
 - Provide next steps
 
-### Option 2: Manual Installation
-
-1. Copy this entire directory to your new repo root
-2. Copy `.env.example` to `.env` and add your API keys
-3. Make scripts executable: `chmod +x cursor-scripts/*.sh`
-4. Run tests to verify installation: `python tests/run_all.py`
-
 ## Contents
 
 ### Directory Structure
 
 ```
 cursor-starter-kit/
-├── install.sh          # Installation script
-├── .cursorrules        # AI behavior rules
-├── .cursorignore       # Files to exclude from Cursor indexing
-├── .gitignore          # Git ignore patterns
-├── .env.example        # Environment variable template
-├── cursor-scripts/     # Cursor workflow tools
-│   ├── cursor_usage.py # Usage tracking & quota management
-│   ├── export-chat.sh  # Chat export to markdown
-│   ├── web_search.py   # Gemini web search with logging
-│   ├── search_script.py# Minimal web search
-│   └── update-cursor.sh# Update Cursor CLI
-├── tests/              # Test suite
-│   ├── README.md       # Test documentation
-│   ├── run_all.py      # Test runner
-│   └── test_*.py       # Individual test files
-├── cursor-chats/       # Exported conversations
-├── cursor-usage/       # Usage CSV imports
-└── cursor-web-search/  # Web search logs
+├── install.sh              # Installation script
+├── .cursorrules            # AI behavior rules
+├── .cursorignore           # Files to exclude from Cursor indexing
+├── .gitignore              # Git ignore patterns
+├── .env.example            # Environment variable template
+├── cursor-scripts/         # Cursor workflow tools
+│   ├── cursor_usage.py     # Usage tracking & quota management
+│   ├── export-chat.sh      # Chat export to markdown
+│   ├── cursor-new-chat.sh  # Export + clear for fresh start
+│   ├── web_search.py       # Gemini web search with logging
+│   ├── search_script.py    # Minimal web search
+│   ├── update-cursor.sh    # Update Cursor CLI
+│   ├── review.py           # Flashcard system (spaced repetition)
+│   ├── startup_cards.py    # Daily digest + quiz at startup
+│   └── get_model_benchmarks.py  # AI model selection helper
+├── tests/                  # Test suite
+│   ├── README.md           # Test documentation
+│   ├── run_all.py          # Test runner
+│   └── test_*.py           # Individual test files
+├── cursor-chats/           # Exported conversations
+├── cursor-usage/           # Usage CSV imports
+├── cursor-web-search/      # Web search logs
+└── cursor-data/            # Flashcard and learning data
 ```
 
 ### Tools
@@ -83,17 +81,26 @@ cursor-starter-kit/
 |------|---------|--------------|
 | `cursor_usage.py` | Track usage, quota, budget, alerts | None (uses local CSVs) |
 | `export-chat.sh` | Export chat from Cursor SQLite | Access to `~/.cursor/chats` |
+| `cursor-new-chat.sh` | Export + clear history for fresh start | Access to `~/.cursor/chats` |
 | `web_search.py` | Web search with logging | `GEMINI_API_KEY` |
 | `search_script.py` | Quick web search | `GEMINI_API_KEY` |
 | `update-cursor.sh` | Update Cursor CLI | Internet access |
+| `review.py` | Flashcard system with spaced repetition | None |
+| `startup_cards.py` | Daily digest + quiz at conversation start | None |
+| `get_model_benchmarks.py` | Fetch latest AI model benchmarks | `GEMINI_API_KEY` |
 
 ### Key Features
 
 - **Session continuity**: Auto-summarizes recent work at conversation start
 - **Usage tracking**: Import Cursor usage CSVs, track quota, set budgets
 - **Chat export**: One command (`/e`) to export conversation to markdown
+- **New chat**: Export + clear history for fresh context
 - **Web search**: Gemini-powered search with automatic logging
 - **Daily reminders**: Prompts to export yesterday's usage data
+- **Flashcards**: Spaced repetition system for learning
+- **Startup quiz**: Random review card at each session start
+- **Model selection**: Fetch latest benchmarks for AI model recommendations
+- **Research protocol**: Multi-source grounding (codebase → docs → web → browser)
 
 ## Customization
 
@@ -102,6 +109,13 @@ After copying to your repo:
 1. Edit `.cursorrules` to add project-specific protocols
 2. Update `.cursorignore` for your file patterns
 3. Add project-specific API keys to `.env`
+4. Customize categories in `review.py` for your domain
+
+### Flashcard Categories
+
+Default categories in `review.py`: `dev`, `concept`, `tool`, `workflow`, `debug`, `general`
+
+To customize, edit the `CATEGORIES` list at the top of the file.
 
 ## Testing
 
@@ -116,6 +130,52 @@ python tests/test_cursor_usage.py
 ```
 
 See `tests/README.md` for full test documentation.
+
+## Learning Tools Usage
+
+### Flashcards
+
+```bash
+# Add a card
+python cursor-scripts/review.py --add "What is X?" "X is..."
+
+# Review due cards
+python cursor-scripts/review.py --quiz
+
+# Check stats
+python cursor-scripts/review.py --stats
+
+# Export to markdown
+python cursor-scripts/review.py --export > flashcards.md
+```
+
+### Startup Cards
+
+Automatically shown at conversation start (configured in `.cursorrules`):
+
+```bash
+# Manual trigger
+python cursor-scripts/startup_cards.py
+
+# Just digest
+python cursor-scripts/startup_cards.py --digest
+
+# Reveal quiz answer
+python cursor-scripts/startup_cards.py --reveal
+```
+
+### Model Benchmarks
+
+```bash
+# General benchmarks
+python cursor-scripts/get_model_benchmarks.py
+
+# Task-specific
+python cursor-scripts/get_model_benchmarks.py coding
+python cursor-scripts/get_model_benchmarks.py reasoning
+python cursor-scripts/get_model_benchmarks.py writing
+python cursor-scripts/get_model_benchmarks.py fast
+```
 
 ## MCP Bypass Pattern
 
