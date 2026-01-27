@@ -202,7 +202,7 @@ python cursor-scripts/get_model_benchmarks.py fast
 
 ## MCP Bypass Pattern
 
-If you need to work around Cursor's MCP tool serialization issues, see the `mcp-bypass-skeleton/` directory (if included) for a template wrapper pattern.
+If you need to work around Cursor's MCP tool serialization issues, see `MCP-WRAPPER-PATTERN.md` for a complete guide with code examples.
 
 ## Template Repository Maintenance
 
