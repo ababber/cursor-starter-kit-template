@@ -73,16 +73,18 @@ Includes: `~/.zshrc`, `~/.config/*`, `~/.ssh/*`, any external path
 | 2 | **Local Docs** | Read `.md` files | Project-specific guides, READMEs |
 | 3 | **Web Search** | `web_search.py` | Queries, discovery, external info |
 | 4 | **WebFetch** | `WebFetch` tool | Known URLs, specific doc pages |
-| 5 | **Browser** | Browser MCP tools | JS-rendered pages, interaction needed |
+| 5 | **Browser** | Browser MCP tools | JS-rendered pages (IDE only) |
 
 **Web tool hierarchy:**
 | Tool | Best For | Speed | When to Use |
 |------|----------|-------|-------------|
 | `web_search.py` | Queries, discovery | Fast | Primary - Gemini + Google grounding |
 | `WebFetch` | Specific URLs | Medium | Secondary - direct fetch of known pages |
-| Browser MCP | JS pages, interaction | Slow | Fallback - when above return incomplete |
+| Browser MCP | JS pages, interaction | Slow | Fallback (IDE only — not available in Cursor CLI) |
 
-**Use Browser MCP when:**
+**Browser MCP:** Available in **IDE only**. Not available in Cursor CLI — use `web_search.py` or WebFetch instead.
+
+**Use Browser MCP when (IDE only):**
 - Page requires JavaScript rendering (WebFetch returns incomplete/empty)
 - Need to navigate or interact with the page
 - Visual verification needed
@@ -92,7 +94,7 @@ Includes: `~/.zshrc`, `~/.config/*`, `~/.ssh/*`, any external path
 - **Run sources in parallel** when independent (e.g., grep codebase + read docs simultaneously)
 - **Cite sources** in response (file paths, URLs from web search)
 - **Skip steps** only if clearly irrelevant (e.g., skip codebase for "what's the weather")
-- **Escalate to browser** only when faster methods fail
+- **Escalate to browser** only when faster methods fail (IDE; in CLI use WebFetch or web search)
 
 **Example triggers:**
 - "How do I use X?" → Codebase (existing examples) → Docs → Web (official docs)

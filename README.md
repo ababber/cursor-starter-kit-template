@@ -100,7 +100,7 @@ cursor-starter-kit/
 - **Flashcards**: Spaced repetition system for learning
 - **Startup quiz**: Random review card at each session start
 - **Model selection**: Fetch latest benchmarks for AI model recommendations
-- **Research protocol**: Multi-source grounding (codebase → docs → web → browser)
+- **Research protocol**: Multi-source grounding (codebase → docs → web → browser; browser fallback is IDE-only, not available in Cursor CLI)
 
 ## Customization
 
