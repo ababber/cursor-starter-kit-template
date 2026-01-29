@@ -66,7 +66,6 @@ def test_cursorrules_protocols():
         ("Self-check", "Self-check:"),
         ("Conversation Export", "📝 Conversation Export"),
         ("Workspace Boundaries", "🚫 Workspace Boundaries"),
-        ("Environment Detection", "🔍 Environment Detection"),
         ("Git Commits", "Git Commits"),
         ("COMMIT-CONVENTIONS.md reference", "COMMIT-CONVENTIONS.md"),
     ]
@@ -146,31 +145,6 @@ def test_export_chat():
     return is_executable
 
 
-def test_environment_detection():
-    """Test environment detection (CLI vs IDE)."""
-    print("\n🔍 Environment Detection")
-    print("-" * 40)
-    
-    # Test docker ps (determines CLI vs IDE)
-    try:
-        result = subprocess.run(
-            ["docker", "ps"],
-            capture_output=True,
-            text=True,
-            timeout=10
-        )
-        is_cli = result.returncode == 0
-        env_type = "CLI (Docker available)" if is_cli else "IDE (Docker not available)"
-        print_result(f"Environment: {env_type}", True)
-        return True
-    except FileNotFoundError:
-        print_result("Environment: IDE (Docker not installed)", True)
-        return True
-    except Exception as e:
-        print_result("docker ps check", False, str(e))
-        return False
-
-
 def test_commit_conventions():
     """Test that COMMIT-CONVENTIONS.md contains required sections."""
     print("\n📋 Commit Conventions")
@@ -208,7 +182,6 @@ def main():
     results.append(("Protocol Sections", test_cursorrules_protocols()))
     results.append(("Session Continuity", test_session_continuity_commands()))
     results.append(("Conversation Export", test_export_chat()))
-    results.append(("Environment Detection", test_environment_detection()))
     results.append(("Commit Conventions", test_commit_conventions()))
     
     # Summary

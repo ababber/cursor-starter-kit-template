@@ -6,7 +6,7 @@
 
 ## 🔄 Session Continuity
 
-**⚠️ ALWAYS run at conversation start (no exceptions):**
+**⚠️ MANDATORY:** ALWAYS run at conversation start (no exceptions):
 1. Run `git --no-pager log --stat -5`
 2. Run `python cursor-scripts/cursor_usage.py reminder --once`
 3. Run `python cursor-scripts/startup_cards.py` for daily digest + quiz
@@ -18,6 +18,8 @@
 - Otherwise → Ask: "Resume from where we left off, or start something new?"
 
 **No skipping:** These checks surface critical context (recent changes, learning reminders) that affects task execution.
+
+**Self-check:** Run startup checks at conversation start (git log, cursor_usage reminder, startup_cards, summarize).
 
 ---
 
@@ -158,8 +160,6 @@ python cursor-scripts/cursor_usage.py reminder # CSV reminder
 # Web search
 python cursor-scripts/web_search.py "query"
 
-# Update Cursor CLI
-./cursor-scripts/update-cursor.sh
 ```
 
 ### Learning Tools
@@ -224,7 +224,6 @@ python cursor-scripts/startup_cards.py --reveal # Show quiz answer (records as r
 To customize for your project, add sections below this line:
 - Domain-specific protocols (e.g., API wrappers, testing workflows)
 - Project-specific tool paths
-- Custom environment detection (if needed)
 
 ---
 

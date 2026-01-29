@@ -76,7 +76,6 @@ EXPECTED_FILES=(
     ".env.example"
     "cursor-scripts/cursor_usage.py"
     "cursor-scripts/export-chat.sh"
-    "cursor-scripts/update-cursor.sh"
     "tests/run_all.py"
 )
 
@@ -101,7 +100,6 @@ echo ""
 echo "5. Verifying scripts are executable..."
 EXECUTABLE_SCRIPTS=(
     "cursor-scripts/export-chat.sh"
-    "cursor-scripts/update-cursor.sh"
 )
 
 for script in "${EXECUTABLE_SCRIPTS[@]}"; do
