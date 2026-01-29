@@ -2,7 +2,7 @@
 
 A portable template for setting up Cursor CLI workflows in new repositories.
 
-**Philosophy:** AI answers should be verified. This template includes `.cursorrules`, `web_search.py`, and logging (web searches, chats) to help ground information in verifiable sources — don't rely solely on model training data.
+**Philosophy:** AI answers should be verified. This template includes `.cursorrules`, `web_search.py`, and logging (web searches, chats) to expand reference and improve verification — don't rely solely on model training data.
 
 ## Quick Start
 
@@ -82,9 +82,9 @@ cursor-starter-kit/
 
 | Tool | Purpose | Requirements |
 |------|---------|--------------|
-| `cursor_usage.py` | Track usage, quota, budget, alerts (On-Demand vs Included; quota uses On-Demand only) | None (uses local CSVs) |
+| `cursor_usage.py` | Track usage to help manage API costs (quota, budget, alerts; On-Demand vs Included) | None (uses local CSVs) |
 | `export-chat.sh` | Export chat from Cursor SQLite | Access to `~/.cursor/chats` |
-| `cursor-new-chat.sh` | Export + clear history for fresh start | Access to `~/.cursor/chats` |
+| `cursor-new-chat.sh` | Manage context window (export + clear); chats saved for reference | Access to `~/.cursor/chats` |
 | `web_search.py` | Web search with logging | `GEMINI_API_KEY` |
 | `search_script.py` | Quick web search | `GEMINI_API_KEY` |
 | `update-cursor.sh` | Update Cursor CLI | Internet access |
