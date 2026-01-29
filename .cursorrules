@@ -1,5 +1,9 @@
 # Cursor Rules
 
+**This file:** Adding too much leads to rules being ignored. Only add when needed. Do not change `.cursorrules` without asking the user.
+
+**Prefer local tools over sending data to servers.** When a task can be done locally (e.g. copy a file, search the codebase, transform text), use local execution (copy tool, read+write, grep) rather than sending content to an external service to do the same thing.
+
 ## 🔄 Session Continuity
 
 **⚠️ ALWAYS run at conversation start (no exceptions):**
