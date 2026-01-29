@@ -28,7 +28,6 @@ python tests/test_startup_cards.py
 | `export-chat.sh` | `test_export_chat.py` | ✅ |
 | `web_search.py` | `test_web_search.py` | ⚠️ (requires API key) |
 | `search_script.py` | `test_search_script.py` | ⚠️ (requires API key) |
-| `update-cursor.sh` | `test_update_cursor.py` | ⚠️ (dry-run only) |
 | `review.py` | `test_review.py` | ✅ (quiz, practice, flow) |
 | `startup_cards.py` | `test_startup_cards.py` | ✅ (digest, quiz, reveal) |
 
@@ -69,7 +68,6 @@ tests/
 ├── test_export_chat.py    # Chat export tests
 ├── test_web_search.py     # Web search tests
 ├── test_search_script.py  # Minimal search tests
-├── test_update_cursor.py # Update script tests
 ├── test_review.py        # Flashcard/quiz-through-AI tests
 ├── test_startup_cards.py # Daily digest and reveal-as-review tests
 └── fixtures/             # Test data
@@ -80,4 +78,3 @@ tests/
 
 - **API Tests**: Web search tests require `GEMINI_API_KEY`. Use `--skip-api` to skip.
 - **Export Tests**: Require access to `~/.cursor/chats`. Will skip if not available.
-- **Update Tests**: Only test script syntax, not actual updates (dry-run).

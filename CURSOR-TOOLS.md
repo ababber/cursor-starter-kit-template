@@ -34,11 +34,6 @@ Quick reference for the custom tools/scripts in this template.
   - Example: `python cursor-scripts/search_script.py "query"`.
   - External requirements: Google Gemini API key (`GEMINI_API_KEY`), internet access.
 
-- `cursor-scripts/update-cursor.sh`
-  - Update Cursor CLI using the official install script.
-  - Example: `./cursor-scripts/update-cursor.sh`.
-  - External requirements: internet access.
-
 - `cursor-scripts/review.py`
   - Flashcard system with spaced repetition (add, quiz, stats, export).
   - Data: `cursor-data/flashcards.json`.
@@ -62,7 +57,6 @@ Quick reference for the custom tools/scripts in this template.
 - `cursor-scripts/cursor-new-chat.sh`
 - `cursor-scripts/web_search.py`
 - `cursor-scripts/search_script.py`
-- `cursor-scripts/update-cursor.sh`
 - `cursor-scripts/review.py`
 - `cursor-scripts/startup_cards.py`
 - `cursor-scripts/get_model_benchmarks.py`
