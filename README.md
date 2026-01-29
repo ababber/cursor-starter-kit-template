@@ -83,7 +83,7 @@ cursor-starter-kit/
 |------|---------|--------------|
 | `cursor_usage.py` | Track usage to help manage API costs (quota, budget, alerts; On-Demand vs Included) | None (uses local CSVs) |
 | `export-chat.sh` | Export chat from Cursor SQLite | Access to `~/.cursor/chats` |
-| `cursor-new-chat.sh` | Manage context window (export + clear); chats saved for reference | Access to `~/.cursor/chats` |
+| `cursor-new-chat.sh` | Manage context exhaustion (export + clear); chats saved for reference | Access to `~/.cursor/chats` |
 | `web_search.py` | Web search with logging | `GEMINI_API_KEY` |
 | `search_script.py` | Quick web search | `GEMINI_API_KEY` |
 | `review.py` | Flashcard system with spaced repetition | None |
