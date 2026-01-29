@@ -12,7 +12,7 @@ Usage:
     python cursor-scripts/cursor_usage.py report --daily     # Daily breakdown
     python cursor-scripts/cursor_usage.py report --weekly    # Weekly breakdown
     python cursor-scripts/cursor_usage.py quota              # Check quota usage vs limits
-    python cursor-scripts/cursor_usage.py quota --on-demand-reported 16  # Match Cursor console (authoritative)
+    python cursor-scripts/cursor_usage.py quota --on-demand-reported 17   # Web vs CSV (17 = from Cursor console)
     python cursor-scripts/cursor_usage.py budget             # Daily budget for rest of cycle
     python cursor-scripts/cursor_usage.py alerts             # Exit non-zero on thresholds
     python cursor-scripts/cursor_usage.py reminder           # Remind to export yesterday's CSV
@@ -186,8 +186,9 @@ def report_summary(days: int = None):
     print("=" * 60)
     print(f"CURSOR USAGE REPORT ({period})")
     print("=" * 60)
+    print(f"\n(All figures below are from CSV — imported usage files.)")
     print(f"\nTotal Interactions: {row['count']:,}")
-    print(f"Total Cost: ${row['total_cost']:.2f}")
+    print(f"Total Cost (CSV):   ${row['total_cost']:.2f}")
     print(f"Total Tokens: {row['total_tokens']:,}")
     print(f"Avg Cost/Interaction: ${row['avg_cost']:.3f}")
 
@@ -474,19 +475,22 @@ def quota_check(billing_day: int = DEFAULT_BILLING_DAY, json_output: bool = Fals
     print("USAGE THIS CYCLE")
     print(f"{'─' * 70}")
     print(f"Total Requests: {total_requests:,}")
-    print(f"Total Cost (CSV): ${total_cost:.2f}")
+    print(f"\n  From CSV (imported usage files):")
+    print(f"  Total Cost:     ${total_cost:.2f}")
     print(f"  ├─ On-Demand (counts toward quota): ${billable_cost:.2f}")
     print(f"  └─ Included (does not count):      ${included_cost:.2f}")
+    if on_demand_reported is not None:
+        print(f"\n  From web (Cursor console):")
+        print(f"  On-Demand used: ${on_demand_used:.2f} (authoritative for billing)")
 
     print(f"\n{'─' * 70}")
     print("QUOTA STATUS (On-Demand Only)")
     print(f"{'─' * 70}")
-    print(f"On-Demand Cost:   ${billable_cost:.2f}")
+    print(f"On-Demand (CSV):  ${billable_cost:.2f}")
     print(f"Base Included:    ${pro_plus_base:.2f}")
     if on_demand_reported is not None:
-        print(f"On-Demand Used:   ${on_demand_used:.2f} of ${pro_plus_on_demand:.2f} (from console)")
-        if abs(on_demand_from_csv - on_demand_used) > 0.01:
-            print(f"  (CSV-derived:    ${on_demand_from_csv:.2f} — Cursor console is authoritative)")
+        print(f"On-Demand (web):  ${on_demand_used:.2f} of ${pro_plus_on_demand:.2f} ← use this for quota")
+        print(f"  (CSV on-demand:  ${billable_cost:.2f})")
     elif billable_cost > pro_plus_base:
         print(f"On-Demand Used:   ${on_demand_used:.2f} of ${pro_plus_on_demand:.2f}")
     else:
@@ -549,13 +553,15 @@ def quota_check(billing_day: int = DEFAULT_BILLING_DAY, json_output: bool = Fals
     print(f"{'─' * 70}")
     print(f"{'TOTAL':<40} | {format_tokens(total_tokens):>12} |")
 
-    # Show note about billing model
+    # Show note about billing model and web vs CSV
     print(f"\n{'─' * 70}")
     print("CURSOR PRO+ BILLING MODEL")
     print(f"{'─' * 70}")
     print("• Only On-Demand usage counts toward quota; Included usage does not")
     print("• Base included: $70/mo; on-demand credits: $100/mo")
     print("• No per-model token limits — billing is cost-based")
+    if on_demand_reported is None:
+        print("• To compare with Cursor web: quota --on-demand-reported <amount from console>")
 
     db.close()
 
@@ -599,6 +605,7 @@ def budget_check(limit: float = 170.0, billing_day: int = DEFAULT_BILLING_DAY, j
     print("=" * 70)
     print("CURSOR BUDGET CHECK")
     print("=" * 70)
+    print(f"\n(All figures from CSV — imported usage files.)")
     print(f"\nLimit: ${limit:.2f}")
     print(f"Total Cost (CSV):  ${total_cost:.2f}")
     print(f"  ├─ On-Demand (quota): ${billable_cost:.2f}")
@@ -765,7 +772,7 @@ def main():
     quota_parser.add_argument('--billing-day', type=int, default=DEFAULT_BILLING_DAY,
                              help=f'Day of month when billing cycle resets (default: {DEFAULT_BILLING_DAY})')
     quota_parser.add_argument('--on-demand-reported', type=float, metavar='N', dest='on_demand_reported',
-                             help='On-demand $ from Cursor console (overrides CSV-derived value; console is authoritative)')
+                             help='On-demand $ from Cursor web/console (e.g. 17); shows web vs CSV; console is authoritative)')
     quota_parser.add_argument('--json', action='store_true', help='Print JSON to stdout')
     quota_parser.add_argument('--out', help='Write JSON output to a file')
 

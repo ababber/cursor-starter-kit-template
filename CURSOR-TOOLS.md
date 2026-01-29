@@ -8,7 +8,7 @@ Quick reference for the custom tools/scripts in this template.
   - Track Cursor usage from CSV exports (import/report/quota/budget/alerts/reminder/export).
   - **Kind-based billing:** Only **On-Demand** usage counts toward quota; **Included** usage does not. Quota/budget/alerts use On-Demand only.
   - Examples: `python cursor-scripts/cursor_usage.py report`, `python cursor-scripts/cursor_usage.py quota`.
-  - To match Cursor console on-demand $ (authoritative): `python cursor-scripts/cursor_usage.py quota --on-demand-reported 16`.
+  - Web vs CSV: `python cursor-scripts/cursor_usage.py quota --on-demand-reported 17` (17 = from Cursor console; console is authoritative).
   - Default billing day: 14 (configurable with `--billing-day`).
   - External requirements: none (uses local CSVs in `cursor-usage/`).
 

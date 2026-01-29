@@ -138,7 +138,7 @@ python cursor-scripts/web_search.py "query"
 python cursor-scripts/cursor_usage.py import   # Import CSV
 python cursor-scripts/cursor_usage.py report   # Usage report
 python cursor-scripts/cursor_usage.py quota   # Quota status (On-Demand only)
-python cursor-scripts/cursor_usage.py quota --on-demand-reported N  # Match Cursor console (authoritative)
+python cursor-scripts/cursor_usage.py quota --on-demand-reported N  # Web vs CSV (N from Cursor console; authoritative)
 python cursor-scripts/cursor_usage.py budget   # Daily budget (On-Demand only)
 python cursor-scripts/cursor_usage.py alerts   # Threshold alerts (On-Demand only)
 python cursor-scripts/cursor_usage.py reminder # CSV reminder

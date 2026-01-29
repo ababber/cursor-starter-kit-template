@@ -93,7 +93,7 @@ cursor-starter-kit/
 ### Key Features
 
 - **Session continuity**: Auto-summarizes recent work at conversation start
-- **Usage tracking**: Import Cursor usage CSVs; track quota/budget/alerts (On-Demand counts toward quota; Included does not). Use `quota --on-demand-reported N` to match Cursor console.
+- **Usage tracking**: Import Cursor usage CSVs; track quota/budget/alerts (On-Demand counts toward quota; Included does not). Use `quota --on-demand-reported N` for web vs CSV (N from Cursor console; authoritative).
 - **Chat export**: One command (`/e`) to export conversation to markdown
 - **New chat**: Export + clear history for fresh context
 - **Web search**: Gemini-powered search with automatic logging
