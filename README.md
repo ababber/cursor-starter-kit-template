@@ -93,7 +93,7 @@ cursor-starter-kit/
 - **Session continuity**: Auto-summarizes recent work at conversation start
 - **Usage tracking**: Import Cursor usage CSVs; track quota/budget/alerts (On-Demand counts toward quota; Included does not). Use `quota --on-demand-reported N` for web vs CSV (N from Cursor console; authoritative).
 - **Chat export**: One command (`/e`) to export conversation to markdown
-- **Context exhaustion management**: When Cursor's context window fills (watch the % in the footer), responses get slower and less accurate. Run `./cursor-scripts/cursor-new-chat.sh` to export the current chat to `cursor-chats/`, clear history, and start fresh — nothing is lost. Trigger: say "new chat" in conversation.
+- **New chat**: Export current chat and clear history for a fresh start. Also helps manage Cursor's context-window usage (the footer %); when that gets high, starting a new chat keeps the model responsive (context exhaustion management). Run `./cursor-scripts/cursor-new-chat.sh`. In case anything earlier needs to be referenced, the chats are there (exported to `cursor-chats/`). Trigger: say "new chat" in conversation.
 - **Web search**: Gemini-powered search with automatic logging
 - **Daily reminders**: Prompts to export yesterday's usage data
 - **Flashcards**: Spaced repetition system for learning
