@@ -52,6 +52,7 @@ The installer will:
 cursor-starter-kit/
 ├── install.sh              # Installation script
 ├── .cursorrules            # AI behavior rules
+├── CURSOR-TOOLS.md         # Quick reference for custom tools (usage, web search, etc.)
 ├── .cursorignore           # Files to exclude from Cursor indexing
 ├── .gitignore              # Git ignore patterns
 ├── .env.example            # Environment variable template
@@ -79,7 +80,7 @@ cursor-starter-kit/
 
 | Tool | Purpose | Requirements |
 |------|---------|--------------|
-| `cursor_usage.py` | Track usage, quota, budget, alerts | None (uses local CSVs) |
+| `cursor_usage.py` | Track usage, quota, budget, alerts (On-Demand vs Included; quota uses On-Demand only) | None (uses local CSVs) |
 | `export-chat.sh` | Export chat from Cursor SQLite | Access to `~/.cursor/chats` |
 | `cursor-new-chat.sh` | Export + clear history for fresh start | Access to `~/.cursor/chats` |
 | `web_search.py` | Web search with logging | `GEMINI_API_KEY` |
@@ -92,7 +93,7 @@ cursor-starter-kit/
 ### Key Features
 
 - **Session continuity**: Auto-summarizes recent work at conversation start
-- **Usage tracking**: Import Cursor usage CSVs, track quota, set budgets
+- **Usage tracking**: Import Cursor usage CSVs; track quota/budget/alerts (On-Demand counts toward quota; Included does not). Use `quota --on-demand-reported N` to match Cursor console.
 - **Chat export**: One command (`/e`) to export conversation to markdown
 - **New chat**: Export + clear history for fresh context
 - **Web search**: Gemini-powered search with automatic logging

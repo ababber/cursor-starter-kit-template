@@ -134,12 +134,13 @@ python cursor-scripts/web_search.py "query"
 ### Tool Paths
 
 ```bash
-# Usage tracking
+# Usage tracking (On-Demand counts toward quota; Included does not)
 python cursor-scripts/cursor_usage.py import   # Import CSV
 python cursor-scripts/cursor_usage.py report   # Usage report
-python cursor-scripts/cursor_usage.py quota    # Quota status
-python cursor-scripts/cursor_usage.py budget   # Daily budget
-python cursor-scripts/cursor_usage.py alerts   # Threshold alerts
+python cursor-scripts/cursor_usage.py quota   # Quota status (On-Demand only)
+python cursor-scripts/cursor_usage.py quota --on-demand-reported N  # Match Cursor console (authoritative)
+python cursor-scripts/cursor_usage.py budget   # Daily budget (On-Demand only)
+python cursor-scripts/cursor_usage.py alerts   # Threshold alerts (On-Demand only)
 python cursor-scripts/cursor_usage.py reminder # CSV reminder
 
 # Chat export
