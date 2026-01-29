@@ -38,10 +38,10 @@ def run_test(test_file: str) -> bool:
 
 def main():
     tests = [
+        "test_fresh_agent.py",
         "test_cursor_usage.py",
         "test_export_chat.py",
         "test_web_search.py",
-        "test_search_script.py",
         "test_review.py",
         "test_startup_cards.py",
     ]

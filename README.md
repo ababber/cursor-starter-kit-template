@@ -63,7 +63,6 @@ cursor-starter-kit/
 │   ├── export-chat.sh      # Chat export to markdown
 │   ├── cursor-new-chat.sh  # Export + clear for fresh start
 │   ├── web_search.py       # Gemini web search with logging
-│   ├── search_script.py    # Minimal web search
 │   ├── review.py           # Flashcard system (spaced repetition)
 │   ├── startup_cards.py    # Daily digest + quiz at startup
 │   └── get_model_benchmarks.py  # AI model selection helper
@@ -83,9 +82,8 @@ cursor-starter-kit/
 |------|---------|--------------|
 | `cursor_usage.py` | Track usage to help manage API costs (quota, budget, alerts; On-Demand vs Included) | None (uses local CSVs) |
 | `export-chat.sh` | Export chat from Cursor SQLite | Access to `~/.cursor/chats` |
-| `cursor-new-chat.sh` | Manage context exhaustion (export + clear); chats saved for reference | Access to `~/.cursor/chats` |
+| `cursor-new-chat.sh` | Manage context window (export + clear); chats saved for reference | Access to `~/.cursor/chats` |
 | `web_search.py` | Web search with logging | `GEMINI_API_KEY` |
-| `search_script.py` | Quick web search | `GEMINI_API_KEY` |
 | `review.py` | Flashcard system with spaced repetition | None |
 | `startup_cards.py` | Daily digest + quiz at conversation start | None |
 | `get_model_benchmarks.py` | Fetch latest AI model benchmarks | `GEMINI_API_KEY` |
