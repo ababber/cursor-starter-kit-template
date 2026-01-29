@@ -2,6 +2,8 @@
 
 A portable template for setting up Cursor CLI workflows in new repositories.
 
+**Philosophy:** AI answers should be verified. This template includes `.cursorrules`, `web_search.py`, and logging (web searches, chats) to help ground information in verifiable sources — don't rely solely on model training data.
+
 ## Quick Start
 
 ### Option 1: GitHub Template Repository (Easiest)

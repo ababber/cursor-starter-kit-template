@@ -67,6 +67,8 @@ Includes: `~/.zshrc`, `~/.config/*`, `~/.ssh/*`, any external path
 
 ### 🔬 Research Protocol (Multi-Source Grounding)
 
+**Goal:** Ground answers in verifiable sources (codebase, docs, web) rather than relying on training data alone.
+
 **When to trigger:** Any question requiring factual accuracy, technical details, best practices, or current information.
 
 **Mandatory source order:**
