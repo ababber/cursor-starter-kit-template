@@ -99,7 +99,7 @@ cursor-starter-kit/
 - **Web search**: Gemini-powered search with automatic logging
 - **Daily reminders**: Prompts to export yesterday's usage data
 - **Flashcards**: Spaced repetition system for learning
-- **Startup quiz**: Random review card at each session start
+- **Startup quiz**: Random review card at each session start; `--reveal` records as review (SM-2)
 - **Model selection**: Fetch latest benchmarks for AI model recommendations
 - **Research protocol**: Multi-source grounding (codebase → docs → web → browser; browser fallback is IDE-only, not available in Cursor CLI)
 
@@ -164,7 +164,9 @@ See `tests/README.md` for full test documentation.
 python cursor-scripts/review.py --add "What is X?" "X is..."
 
 # Review due cards
-python cursor-scripts/review.py --quiz
+python cursor-scripts/review.py --quiz              # Interactive (terminal)
+python cursor-scripts/review.py --quiz --start     # Quiz-through-AI (one Q at a time)
+python cursor-scripts/review.py --quiz --start --practice  # Practice: random cards
 
 # Check stats
 python cursor-scripts/review.py --stats
@@ -184,7 +186,7 @@ python cursor-scripts/startup_cards.py
 # Just digest
 python cursor-scripts/startup_cards.py --digest
 
-# Reveal quiz answer
+# Reveal quiz answer (records as review for real flashcards)
 python cursor-scripts/startup_cards.py --reveal
 ```
 

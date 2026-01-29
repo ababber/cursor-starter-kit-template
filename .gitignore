@@ -20,6 +20,7 @@ cursor-usage/*.db
 # Learning data (flashcards regenerated per-project)
 cursor-data/flashcards.json
 cursor-data/.current_quiz.json
+cursor-data/.quiz_state.json
 
 # System files
 .DS_Store

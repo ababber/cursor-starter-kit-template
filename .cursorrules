@@ -163,13 +163,15 @@ python cursor-scripts/web_search.py "query"
 python cursor-scripts/review.py --today        # Show due cards
 python cursor-scripts/review.py --add "Q" "A"  # Add card
 python cursor-scripts/review.py --quiz         # Interactive review
+python cursor-scripts/review.py --quiz --start # Quiz-through-AI (one Q at a time)
+python cursor-scripts/review.py --quiz --start --practice  # Practice: random cards, no SM-2
 python cursor-scripts/review.py --stats        # Review statistics
 ```
 
 **Startup Cards (`startup_cards.py`):**
 ```bash
 python cursor-scripts/startup_cards.py          # Full digest + quiz
-python cursor-scripts/startup_cards.py --reveal # Show quiz answer
+python cursor-scripts/startup_cards.py --reveal # Show quiz answer (records as review for real cards)
 ```
 
 **Data storage:** `cursor-data/flashcards.json`

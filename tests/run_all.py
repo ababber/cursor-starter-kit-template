@@ -43,6 +43,8 @@ def main():
         "test_web_search.py",
         "test_search_script.py",
         "test_update_cursor.py",
+        "test_review.py",
+        "test_startup_cards.py",
     ]
     
     print("Cursor Starter Kit Test Suite")

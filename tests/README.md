@@ -15,6 +15,8 @@ python tests/test_fresh_agent.py
 python tests/test_cursor_usage.py
 python tests/test_export_chat.py
 python tests/test_web_search.py
+python tests/test_review.py
+python tests/test_startup_cards.py
 ```
 
 ## Test Coverage
@@ -27,6 +29,8 @@ python tests/test_web_search.py
 | `web_search.py` | `test_web_search.py` | ⚠️ (requires API key) |
 | `search_script.py` | `test_search_script.py` | ⚠️ (requires API key) |
 | `update-cursor.sh` | `test_update_cursor.py` | ⚠️ (dry-run only) |
+| `review.py` | `test_review.py` | ✅ (quiz, practice, flow) |
+| `startup_cards.py` | `test_startup_cards.py` | ✅ (digest, quiz, reveal) |
 
 ## Requirements
 
@@ -65,8 +69,10 @@ tests/
 ├── test_export_chat.py    # Chat export tests
 ├── test_web_search.py     # Web search tests
 ├── test_search_script.py  # Minimal search tests
-├── test_update_cursor.py  # Update script tests
-└── fixtures/              # Test data
+├── test_update_cursor.py # Update script tests
+├── test_review.py        # Flashcard/quiz-through-AI tests
+├── test_startup_cards.py # Daily digest and reveal-as-review tests
+└── fixtures/             # Test data
     └── sample_usage.csv   # Sample CSV for import tests
 ```
 

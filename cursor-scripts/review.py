@@ -10,8 +10,12 @@ Usage:
     python review.py --add "Q" "A" -c dev # Add card with category
     python review.py --list               # Show all cards
     python review.py --stats              # Show review statistics
-    python review.py --quiz               # Interactive quiz mode
-    python review.py --random             # Random card (for startup)
+    python review.py --quiz               # Interactive quiz (terminal)
+    python review.py --quiz --start       # Start quiz-through-AI (one Q at a time)
+    python review.py --quiz --start --practice  # Practice: random cards, no schedule change
+    python review.py --quiz --answer "X"  # Submit answer
+    python review.py --quiz --skip        # Skip current card
+    python review.py --random            # Random card (for startup)
     python review.py --random-from-files "*.py"  # Random from recent files
     python review.py --export             # Export cards to markdown
     python review.py --import-from FILE   # Import cards from markdown
@@ -30,6 +34,7 @@ from typing import Optional
 # Data file location
 DATA_DIR = Path(__file__).parent.parent / "cursor-data"
 FLASHCARDS_FILE = DATA_DIR / "flashcards.json"
+QUIZ_STATE_FILE = DATA_DIR / ".quiz_state.json"
 
 # Categories for organizing cards (customize for your domain)
 CATEGORIES = ["dev", "concept", "tool", "workflow", "debug", "general"]
@@ -199,6 +204,16 @@ def get_random_card(category: str = None, from_files: list = None) -> Optional[d
         return None
     
     return random.choice(cards)
+
+
+def get_random_cards(n: int = 5) -> list:
+    """Return n random cards from the full deck (for practice mode)."""
+    data = load_cards()
+    cards = data.get("cards", [])
+    if not cards:
+        return []
+    k = min(n, len(cards))
+    return random.sample(cards, k)
 
 
 def get_stats() -> dict:
@@ -412,6 +427,180 @@ def interactive_quiz(cards: list):
     print(f"Streak: {stats['streak_days']} days | Total reviews: {stats['total_reviews']}")
 
 
+# -----------------------------------------------------------------------------
+# Quiz-through-AI: stateful, non-interactive (run via Cursor / script)
+# -----------------------------------------------------------------------------
+
+
+def save_quiz_state(state: dict) -> None:
+    """Persist quiz state for --answer / --skip."""
+    DATA_DIR.mkdir(exist_ok=True)
+    with open(QUIZ_STATE_FILE, "w") as f:
+        json.dump(state, f, indent=2, default=str)
+
+
+def load_quiz_state() -> Optional[dict]:
+    """Load current quiz state; None if no quiz in progress."""
+    if not QUIZ_STATE_FILE.exists():
+        return None
+    with open(QUIZ_STATE_FILE, "r") as f:
+        return json.load(f)
+
+
+def clear_quiz_state() -> None:
+    """Remove quiz state file."""
+    if QUIZ_STATE_FILE.exists():
+        QUIZ_STATE_FILE.unlink()
+
+
+def quiz_start(practice: bool = False, practice_limit: int = 5) -> str:
+    """Start a quiz-through-AI session: save state, return first question text.
+    practice: if True, use random cards from full deck and do not update SM-2.
+    """
+    if practice:
+        cards = get_random_cards(practice_limit)
+        if not cards:
+            return "No cards in deck. Add cards with --add."
+        label = "PRACTICE"
+    else:
+        cards = get_due_cards()
+        if not cards:
+            return "No cards due for review today. Use --quiz --start --practice to run a practice session."
+        label = "QUIZ"
+    state = {
+        "cards": cards,
+        "index": 0,
+        "correct_count": 0,
+        "started_at": datetime.now().isoformat(),
+        "practice": practice,
+    }
+    save_quiz_state(state)
+    card = cards[0]
+    n = len(cards)
+    sub = " (schedule unchanged)" if practice else ""
+    lines = [
+        "",
+        "=" * 50,
+        f"  {label} – {n} card(s){sub} | Reply with your answer, or say 'skip'",
+        "=" * 50,
+        "",
+        f"[1/{n}] ({card['category']})",
+        "",
+        f"Q: {card['question']}",
+        "",
+        "Reply in chat with your answer, then I'll show the next card.",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def quiz_answer(user_answer: str) -> str:
+    """Show your answer, correct answer; advance to next or finish."""
+    state = load_quiz_state()
+    if not state or not state.get("cards"):
+        return "No quiz in progress. Run: python cursor-scripts/review.py --quiz --start"
+    cards = state["cards"]
+    idx = state["index"]
+    if idx >= len(cards):
+        clear_quiz_state()
+        return "Quiz already finished. Run --quiz --start to start a new one."
+    card = cards[idx]
+    correct = card.get("answer", "")
+    is_practice = state.get("practice", False)
+    if not is_practice:
+        updated = review_card(card["id"], 4)  # Assume engaged; no grader
+        next_review = datetime.fromisoformat(updated["next_review"]).strftime("%Y-%m-%d")
+    lines = [
+        "",
+        "-" * 50,
+        "  YOUR ANSWER",
+        "-" * 50,
+        "",
+        user_answer.strip() or "(empty)",
+        "",
+        "-" * 50,
+        "  CORRECT ANSWER (from card)",
+        "-" * 50,
+        "",
+        correct,
+        "",
+    ]
+    if is_practice:
+        lines.append("Practice mode – no schedule change.")
+    else:
+        lines.append(f"Next review (SM-2): {next_review}")
+    lines.append("")
+    state["index"] = idx + 1
+    if state["index"] >= len(cards):
+        lines.append("=" * 50)
+        lines.append("  QUIZ COMPLETE")
+        lines.append("=" * 50)
+        clear_quiz_state()
+        return "\n".join(lines)
+    save_quiz_state(state)
+    next_card = cards[state["index"]]
+    n = len(cards)
+    i = state["index"] + 1
+    lines.extend([
+        "",
+        "=" * 50,
+        f"  Next card [{i}/{n}]",
+        "=" * 50,
+        "",
+        f"Q: {next_card['question']}",
+        "",
+        "Reply with your answer (or say 'skip').",
+        "",
+    ])
+    return "\n".join(lines)
+
+
+def quiz_skip() -> str:
+    """Skip current card: show answer, advance to next or finish."""
+    state = load_quiz_state()
+    if not state or not state.get("cards"):
+        return "No quiz in progress. Run: python cursor-scripts/review.py --quiz --start"
+    cards = state["cards"]
+    idx = state["index"]
+    if idx >= len(cards):
+        clear_quiz_state()
+        return "Quiz already finished."
+    card = cards[idx]
+    if not state.get("practice", False):
+        review_card(card["id"], 0)
+    lines = [
+        "",
+        "-" * 50,
+        "  SKIPPED",
+        "-" * 50,
+        "",
+        f"A: {card['answer']}",
+        "",
+    ]
+    state["index"] = idx + 1
+    if state["index"] >= len(cards):
+        lines.append("=" * 50)
+        lines.append("  QUIZ COMPLETE")
+        lines.append("=" * 50)
+        clear_quiz_state()
+        return "\n".join(lines)
+    save_quiz_state(state)
+    next_card = cards[state["index"]]
+    n, i = len(cards), state["index"] + 1
+    lines.extend([
+        "",
+        "=" * 50,
+        f"  Next [{i}/{n}]",
+        "=" * 50,
+        "",
+        f"Q: {next_card['question']}",
+        "",
+        "Reply with your answer (or 'skip').",
+        "",
+    ])
+    return "\n".join(lines)
+
+
 def parse_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
@@ -432,7 +621,11 @@ Examples:
   python review.py --today
   python review.py --add "What is X?" "X is a tool for Y"
   python review.py --add "Question" "Answer" -c dev -t "python,debugging"
-  python review.py --quiz
+  python review.py --quiz                    # Interactive (terminal)
+  python review.py --quiz --start            # Start quiz-through-AI (one Q at a time)
+  python review.py --quiz --start --practice # Practice: random cards, no schedule change
+  python review.py --quiz --answer "..."     # Submit answer (after --start)
+  python review.py --quiz --skip             # Skip current card
   python review.py --random
         """
     )
@@ -442,7 +635,11 @@ Examples:
     parser.add_argument("--add", nargs=2, metavar=("Q", "A"), help="Add a new card")
     parser.add_argument("--list", action="store_true", help="List all cards")
     parser.add_argument("--stats", action="store_true", help="Show review statistics")
-    parser.add_argument("--quiz", action="store_true", help="Interactive quiz mode")
+    parser.add_argument("--quiz", action="store_true", help="Quiz mode")
+    parser.add_argument("--start", action="store_true", help="Start quiz-through-AI (use with --quiz)")
+    parser.add_argument("--answer", type=str, metavar="TEXT", help="Submit answer (use with --quiz)")
+    parser.add_argument("--skip", action="store_true", help="Skip current card (use with --quiz)")
+    parser.add_argument("--practice", action="store_true", help="Practice mode: random cards, no SM-2 update (use with --quiz --start)")
     parser.add_argument("--random", action="store_true", help="Show a random card")
     parser.add_argument("--random-from-files", nargs="*", help="Random card from specific files")
     parser.add_argument("--export", action="store_true", help="Export cards to markdown")
@@ -534,7 +731,18 @@ def main():
             print()
         return
     
-    # Interactive quiz
+    # Quiz-through-AI (stateful, no input())
+    if args.quiz and (args.start or args.answer is not None or args.skip):
+        if args.start:
+            practice_limit = getattr(args, "limit", 5)
+            print(quiz_start(practice=args.practice, practice_limit=practice_limit))
+        elif args.answer is not None:
+            print(quiz_answer(args.answer))
+        elif args.skip:
+            print(quiz_skip())
+        return
+    
+    # Interactive quiz (terminal; uses input())
     if args.quiz:
         due = get_due_cards()
         if args.category:
@@ -548,7 +756,7 @@ def main():
         if args.json:
             print(json.dumps(card, indent=2))
         elif card:
-            print(f"\n{card['category'].upper()}")
+            print(f"\n🎴 RANDOM CARD ({card['category']})")
             print(f"\nQ: {card['question']}\n")
             print("[Press Enter to reveal answer]")
         else:
@@ -608,7 +816,7 @@ def main():
     
     # Default: show stats summary
     stats = get_stats()
-    print(f"\nFlashcards: {stats['total_cards']} total, {stats['due_today']} due")
+    print(f"\n📚 Flashcards: {stats['total_cards']} total, {stats['due_today']} due")
     print(f"   Streak: {stats['streak_days']} days")
     if stats['due_today'] > 0:
         print(f"\n   Run 'python review.py --quiz' to review due cards")

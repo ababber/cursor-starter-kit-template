@@ -12,7 +12,7 @@ Usage:
     python startup_cards.py --quiz       # Just quiz
     python startup_cards.py --json       # JSON output for parsing
     python startup_cards.py --compact    # Compact single-line output
-    python startup_cards.py --reveal     # Show quiz answer
+    python startup_cards.py --reveal     # Show quiz answer (auto-records as review for real cards)
 """
 
 import argparse
@@ -26,7 +26,7 @@ from pathlib import Path
 
 # Import from sibling modules
 sys.path.insert(0, str(Path(__file__).parent))
-from review import load_cards, get_due_cards, get_stats, get_random_card
+from review import load_cards, get_due_cards, get_stats, get_random_card, review_card
 
 # File to persist the current quiz card between calls
 QUIZ_CACHE_FILE = Path(__file__).parent.parent / "cursor-data" / ".current_quiz.json"
@@ -101,12 +101,14 @@ def get_quiz_card(use_cache: bool = False) -> dict:
     Args:
         use_cache: If True, load from cache instead of generating new card.
     """
-    # If using cache (for reveal), load saved card
+    # If using cache (for reveal), load saved card only — never generate
     if use_cache:
         cached = load_quiz_card()
         if cached and cached.get("card"):
             return cached
-    
+        # No cache: return empty quiz so reveal says "No quiz card available"
+        return {"card": None, "source_type": ""}
+
     # First, try to get files from yesterday's git activity
     yesterday_files = get_yesterday_files()
     
@@ -140,16 +142,16 @@ def format_digest(digest: dict) -> str:
     """Format digest for display."""
     lines = [
         "─────────────────────────────────────────",
-        "DAILY DIGEST"
+        "📋 DAILY DIGEST"
     ]
     
     if digest["due_cards"] > 0:
         lines.append(f"   {digest['due_cards']} card(s) due for review")
     else:
-        lines.append("   No cards due today")
+        lines.append("   No cards due today ✓")
     
     if digest["streak"] > 0:
-        lines.append(f"   Streak: {digest['streak']} day(s)")
+        lines.append(f"   Streak: {digest['streak']} day(s) 🔥")
     
     if digest["total_cards"] > 0:
         lines.append(f"   Library: {digest['total_cards']} cards ({digest['mastered']} mastered)")
@@ -172,11 +174,11 @@ def format_quiz(quiz: dict) -> str:
     source_label = {
         "yesterday_flashcard": "from yesterday's work",
         "random_flashcard": "random review",
-    }.get(quiz["source_type"], "")
+    }.get(quiz.get("source_type", ""), "")
     
     lines = [
         "─────────────────────────────────────────",
-        f"QUICK QUIZ ({source_label})",
+        f"🎴 QUICK QUIZ ({source_label})",
         "",
         f"   Q: {card['question']}",
         "",
@@ -192,13 +194,13 @@ def format_compact(digest: dict, quiz: dict) -> str:
     parts = []
     
     if digest["due_cards"] > 0:
-        parts.append(f"{digest['due_cards']} due")
+        parts.append(f"📚 {digest['due_cards']} due")
     
     if digest["streak"] > 0:
-        parts.append(f"{digest['streak']}d streak")
+        parts.append(f"🔥 {digest['streak']}d streak")
     
     if quiz.get("card"):
-        parts.append("Quiz ready")
+        parts.append("🎴 Quiz ready")
     
     return " | ".join(parts) if parts else "No cards or quizzes"
 
@@ -211,7 +213,7 @@ def reveal_answer(quiz: dict) -> str:
     
     lines = [
         "─────────────────────────────────────────",
-        "ANSWER",
+        "🎴 ANSWER",
         "",
         f"   A: {card['answer']}",
         ""
@@ -273,9 +275,14 @@ def main():
         print(format_compact(digest, quiz))
         return
     
-    # Reveal answer
+    # Reveal answer (track as review for real flashcards — updates SM-2)
     if args.reveal:
         print(reveal_answer(quiz))
+        card = quiz.get("card")
+        if card and card.get("id") and not card.get("generated"):
+            updated = review_card(card["id"], 4)  # 4 = engaged, count as review
+            next_review = datetime.fromisoformat(updated["next_review"]).strftime("%Y-%m-%d")
+            print(f"\n   Recorded as reviewed (next: {next_review})\n")
         return
     
     # Digest only
