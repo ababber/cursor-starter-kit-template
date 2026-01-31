@@ -28,16 +28,17 @@ def run_test(test_file: str) -> bool:
     print(f"Running {test_file}")
     print(f"{'='*60}")
     
-    result = subprocess.run(
-        [sys.executable, str(test_path)] + (["--skip-api"] if SKIP_API else []),
-        cwd=Path(__file__).parent.parent
-    )
-    
+    if test_path.suffix == ".sh":
+        cmd = ["zsh", str(test_path)]
+    else:
+        cmd = [sys.executable, str(test_path)] + (["--skip-api"] if SKIP_API else [])
+    result = subprocess.run(cmd, cwd=Path(__file__).parent.parent)
     return result.returncode == 0
 
 
 def main():
     tests = [
+        "test_cursor_chats_gitignore.sh",
         "test_fresh_agent.py",
         "test_cursor_usage.py",
         "test_export_chat.py",
