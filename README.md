@@ -227,3 +227,5 @@ cd cursor-starter-kit
 ```
 
 **Note:** Maintenance scripts (`sync-template.sh`, `install-hook.sh`, etc.) are not part of the starter kit - they're tools for managing the template repository.
+
+**Gemini analysis:** if you would like to see what Gemini thinks of this repo, check out this conversation it's wild [Gemini Analysis of cursor-starter-kit-template](https://gemini.google.com/share/1fe756873a38)
