@@ -4,6 +4,8 @@ A portable template for setting up Cursor CLI workflows in new repositories.
 
 **Philosophy:** AI answers should be verified. This template includes `.cursorrules`, `web_search.py`, and logging (web searches, chats) to expand reference and improve verification — don't rely solely on model training data.
 
+**NOTE:** use the [gemini conversation](https://gemini.google.com/share/1fe756873a38) as an entry point into this repo. I used Gemini in Pro mode to analyze the repo; if you are having trouble to see the point of this repo, read the conversation. It'll help you decided whether this tool fits your usecase.
+
 ## Quick Start
 
 ### Option 1: GitHub Template Repository (Easiest)
